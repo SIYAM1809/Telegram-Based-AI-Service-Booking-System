@@ -17,4 +17,4 @@ An automated AI-powered booking agent built with **n8n**, **Groq (Llama 3)**, an
 ## 📋 Example Commands
 - `/catalog` - View all available services.
 - `/book P001` - Start the booking process for a specific service.
-- `My name is [Name]` - The bot "hears" your name and updates your session.
+- `My name is [siyam]` - The bot "hears" your name and updates your session.
