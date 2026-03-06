@@ -827,7 +827,7 @@
           "parameters": [
             {
               "name": "Authorization",
-              "value": "Bearer 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"
+              "value": "YOUR_GROQ_API_KEY_HERE"
             },
             {
               "name": "Content-Type",
