@@ -11,8 +11,8 @@
       "type": "n8n-nodes-base.telegramTrigger",
       "typeVersion": 1.2,
       "position": [
-        -4464,
-        -1520
+        -4944,
+        -1584
       ],
       "id": "b7b6ed51-b03e-46a4-b701-42993da3cfc0",
       "name": "TG Trigger - Incoming Message",
@@ -23,90 +23,6 @@
           "name": "Telegram account"
         }
       }
-    },
-    {
-      "parameters": {
-        "rules": {
-          "values": [
-            {
-              "conditions": {
-                "options": {
-                  "caseSensitive": true,
-                  "leftValue": "",
-                  "typeValidation": "strict",
-                  "version": 3
-                },
-                "conditions": [
-                  {
-                    "leftValue": "={{ $json.route }}",
-                    "rightValue": "catalog",
-                    "operator": {
-                      "type": "string",
-                      "operation": "equals"
-                    },
-                    "id": "67975399-5b1d-4ab0-a023-df7eda463b15"
-                  }
-                ],
-                "combinator": "and"
-              }
-            },
-            {
-              "conditions": {
-                "options": {
-                  "caseSensitive": true,
-                  "leftValue": "",
-                  "typeValidation": "strict",
-                  "version": 3
-                },
-                "conditions": [
-                  {
-                    "id": "1c7521ed-bd03-4dd2-bc3e-964f994e0880",
-                    "leftValue": "={{ ($node[\"SET - Normalize Input\"].json.text || \"\").replace(/^\\//, \"\") }}",
-                    "rightValue": "book",
-                    "operator": {
-                      "type": "string",
-                      "operation": "startsWith"
-                    }
-                  }
-                ],
-                "combinator": "and"
-              }
-            },
-            {
-              "conditions": {
-                "options": {
-                  "caseSensitive": true,
-                  "leftValue": "",
-                  "typeValidation": "strict",
-                  "version": 3
-                },
-                "conditions": [
-                  {
-                    "id": "76a2797e-cde3-4330-a385-ab21e8804170",
-                    "leftValue": "={{ $node[\"SET - Normalize Input\"].json.text }}",
-                    "rightValue": "",
-                    "operator": {
-                      "type": "string",
-                      "operation": "exists",
-                      "singleValue": true
-                    }
-                  }
-                ],
-                "combinator": "and"
-              }
-            }
-          ]
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.switch",
-      "typeVersion": 3.4,
-      "position": [
-        -2112,
-        -256
-      ],
-      "id": "311bd5fb-87b4-4743-bf18-9b22e6a52c1a",
-      "name": "SW - Route Command"
     },
     {
       "parameters": {
@@ -129,8 +45,8 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
       "position": [
-        -1904,
-        -656
+        -3392,
+        -1408
       ],
       "id": "a71740bb-4b5d-4ccd-9ba7-abc7b0111354",
       "name": "GS - Read Products Sheet",
@@ -148,8 +64,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -1664,
-        -816
+        -3200,
+        -1888
       ],
       "id": "3f9a19ae-7fb0-484f-bfc8-e5f57e4d2cbe",
       "name": "JS - Build Catalog Message"
@@ -157,14 +73,14 @@
     {
       "parameters": {
         "chatId": "={{$node[\"TG Trigger - Incoming Message\"].json.message.chat.id}}",
-        "text": "Booking flow coming next. Send: book P001",
+        "text": "=={{ $json.message }}\n",
         "additionalFields": {}
       },
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        -1440,
-        -816
+        -3008,
+        -1888
       ],
       "id": "b8e9b670-6455-47bf-a084-cbf67b487c11",
       "name": "TG - Send Catalog",
@@ -173,118 +89,6 @@
         "telegramApi": {
           "id": "pgxXcOAGv5RQEpoZ",
           "name": "Telegram account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "jsCode": "const text = ($node[\"TG Trigger - Incoming Message\"].json.message.text || \"\").trim();\n\n// Accept formats: \"book P001\" or \"/book P001\"\nconst match = text.match(/^(\\/?book)\\s+([A-Za-z0-9_-]+)\\s*$/i);\n\nif (!match) {\n  return [{\n    json: {\n      ok: false,\n      error: \"Invalid format. Use: book P001\",\n    }\n  }];\n}\n\nreturn [{\n  json: {\n    ok: true,\n    product_id: match[2].toUpperCase(),\n  }\n}];"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        -496,
-        -704
-      ],
-      "id": "8b43bf69-4bbf-4147-988a-39d42877f78b",
-      "name": "JS - Parse Book Command"
-    },
-    {
-      "parameters": {
-        "conditions": {
-          "options": {
-            "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "strict",
-            "version": 3
-          },
-          "conditions": [
-            {
-              "id": "047ad259-78d3-48b4-8c5b-72ed97b7942b",
-              "leftValue": "={{$json.ok}}",
-              "rightValue": true,
-              "operator": {
-                "type": "boolean",
-                "operation": "equals"
-              }
-            }
-          ],
-          "combinator": "and"
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2.3,
-      "position": [
-        -224,
-        -704
-      ],
-      "id": "cc942925-ed33-4c1f-bf54-34f3ef4bccf5",
-      "name": "IF - Book Command Valid?"
-    },
-    {
-      "parameters": {
-        "chatId": "={{$node[\"TG Trigger - Incoming Message\"].json.message.chat.id}}",
-        "text": "=✅ Booking request received!\n\nService: {{$json.name}} ({{$json.product_id}})\nPrice: {{$json.price}} {{$json.currency}}\nDuration: {{$json.service_duration_minutes}} min\n\nReply with your preferred date & time (example: 10 Mar, 5pm).",
-        "additionalFields": {}
-      },
-      "type": "n8n-nodes-base.telegram",
-      "typeVersion": 1.2,
-      "position": [
-        -208,
-        -480
-      ],
-      "id": "821f721f-8dbe-4349-9af0-6aaa07cfafa8",
-      "name": "TG - Send Booking Reply",
-      "webhookId": "5932ede9-57f6-4008-a85f-7ccd7353fe1d",
-      "executeOnce": true,
-      "credentials": {
-        "telegramApi": {
-          "id": "pgxXcOAGv5RQEpoZ",
-          "name": "Telegram account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "documentId": {
-          "__rl": true,
-          "value": "18F8tJXAN7di0RyN6lUjE7BpliA5W1u3GKtuRz-F3sDY",
-          "mode": "list",
-          "cachedResultName": "AI Service Booking - Data",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18F8tJXAN7di0RyN6lUjE7BpliA5W1u3GKtuRz-F3sDY/edit?usp=drivesdk"
-        },
-        "sheetName": {
-          "__rl": true,
-          "value": "gid=0",
-          "mode": "list",
-          "cachedResultName": "Products",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18F8tJXAN7di0RyN6lUjE7BpliA5W1u3GKtuRz-F3sDY/edit#gid=0"
-        },
-        "filtersUI": {
-          "values": [
-            {
-              "lookupColumn": "product_id",
-              "lookupValue": "={{$node[\"JS - Parse Book Command\"].json.product_id}}"
-            }
-          ]
-        },
-        "options": {
-          "returnFirstMatch": true
-        }
-      },
-      "type": "n8n-nodes-base.googleSheets",
-      "typeVersion": 4.7,
-      "position": [
-        -480,
-        -480
-      ],
-      "id": "3598d4a3-bfb0-4439-b01b-39d14f330251",
-      "name": "AI Service Booking - Data",
-      "credentials": {
-        "googleSheetsOAuth2Api": {
-          "id": "klKhIIoPMSlT1P52",
-          "name": "Google Sheets account"
         }
       }
     },
@@ -310,12 +114,13 @@
           "value": {
             "timestamp": "=={{$json.timestamp}}",
             "chat_id": "=={{$json.chat_id}}",
-            "customer_name": "=={{$json.customer_name}}",
+            "customer_name": "={{ $json.customer_name }}",
             "username": "={{ $node[\"TG Trigger - Incoming Message\"].json.message.from.username }}",
             "booking_id": "=={{$json.booking_id}}",
             "product_id": "=={{$json.product_id}}",
-            "service_name": "=",
-            "status": "=={{$json.status}}"
+            "service_name": "={{ $json.service_name || $json.product_id || $json.draft_product_id || \"\" }}",
+            "status": "=={{$json.status}}",
+            "email": "={{ $json.email }}"
           },
           "matchingColumns": [],
           "schema": [
@@ -428,6 +233,16 @@
               "type": "string",
               "canBeUsedToMatch": true,
               "removed": false
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
             }
           ],
           "attemptToConvertTypes": false,
@@ -438,8 +253,8 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
       "position": [
-        -176,
-        16
+        -1568,
+        -1200
       ],
       "id": "9a116f73-8bc8-4966-a33c-d5962817d6c0",
       "name": "Append row in sheet",
@@ -469,7 +284,7 @@
             {
               "id": "a7480682-b206-4744-a93e-deae50c75040",
               "name": "customer_name",
-              "value": "={{ $node[\"TG Trigger - Incoming Message\"].json.message.from.first_name }}",
+              "value": "={{ $json.draft_customer_name }}",
               "type": "string"
             },
             {
@@ -481,19 +296,19 @@
             {
               "id": "0fb6ca2f-fabb-4133-a189-a0a8a013b5e0",
               "name": "product_id",
-              "value": "={{ $node[\"JS - Parse Book Command\"].json.product_id }}",
+              "value": "={{ $json.draft_product_id }}",
               "type": "string"
             },
             {
               "id": "cc0109f1-46a4-4cd4-921b-2be8f210b964",
               "name": "service_name",
-              "value": "={{ $node[\"AI Service Booking - Data\"].json.name }}",
+              "value": "={{ $json.product_name || $json.draft_product_id }}",
               "type": "string"
             },
             {
               "id": "874183c2-93ac-4574-864f-f01c14055a3a",
               "name": "price",
-              "value": "={{ $node[\"AI Service Booking - Data\"].json.price }}",
+              "value": "={{ $json.price || \"\" }}",
               "type": "string"
             },
             {
@@ -515,21 +330,21 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        -464,
-        16
+        -1856,
+        -1200
       ],
       "id": "2127fbe9-a100-4865-893f-a4c210be9269",
       "name": "Edit Fields"
     },
     {
       "parameters": {
-        "jsCode": "const now = new Date().toISOString();\nconst bookingId = \"BKG-\" + Date.now();\n\nreturn [{\n  json: {\n    booking_id: bookingId,\n    timestamp: now, // if your sheet has \"timestamp\" column\n    chat_id: $json.chat_id || \"\", // if your sheet has \"chat_id\" column\n\n    telegram_user_id: $json.telegram_user_id || \"\",\n    telegram_username: $node[\"SET - Normalize Input\"].json.username || \"\",\n\n    customer_name: $json.draft_customer_name || \"\",\n    email: $json.draft_email || \"\",\n\n    product_id: $json.draft_product_id || \"\",\n    product_name: \"\",\n\n    service_name: $json.product_name || \"\",\n\n    quantity: $json.quantity || 1,\n\n    preferred_date: $json.draft_date || \"\",\n    preferred_time: $json.draft_time || \"\",\n\n    status: \"CONFIRMED\",\n    created_at: now,\n    notes: \"\"\n  }\n}];"
+        "jsCode": "const now = new Date().toISOString();\nconsole.log(JSON.stringify($json));\n\nreturn [{\n  json: {\n    ...$json,\n    booking_id: \"\",\n    timestamp: now,\n    customer_name: $json.draft_customer_name || \"\",\n    email: $json.draft_email || \"\",\n    product_id: $json.draft_product_id || \"\",\n    product_name: $json.draft_product_id || \"\",\n    service_name: $json.draft_product_id || \"\",\n    quantity: 1,\n    preferred_date: $json.draft_date || \"\",\n    preferred_time: $json.draft_time || \"\",\n    status: \"CONFIRMED\",\n    created_at: now,\n    notes: \"\"\n  }\n}];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -464,
-        -208
+        -1856,
+        -1424
       ],
       "id": "0e795676-7172-44b4-8155-3bc9f43c6018",
       "name": "JS - Build Booking Row"
@@ -541,8 +356,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -192,
-        -208
+        -1584,
+        -1424
       ],
       "id": "bbc5331c-e8af-44e3-a571-21c5fef5abdf",
       "name": "JS - Build Booking ID"
@@ -606,8 +421,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        -4432,
-        -1296
+        -4928,
+        -1312
       ],
       "id": "3c11a62e-9a48-4757-a76c-18c9df5c2fc4",
       "name": "SET - Normalize Input"
@@ -641,8 +456,8 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
       "position": [
-        -3824,
-        -1472
+        -4928,
+        -1072
       ],
       "id": "553c0405-0903-4e30-8c7e-42702ea6bf69",
       "name": "GS - Load Session",
@@ -660,30 +475,31 @@
           "options": {
             "caseSensitive": true,
             "leftValue": "",
-            "typeValidation": "strict",
+            "typeValidation": "loose",
             "version": 3
           },
           "conditions": [
             {
               "id": "e84d74fd-255f-4d4a-b3ce-939aaa6ef62e",
-              "leftValue": "={{$json.telegram_user_id}}",
+              "leftValue": "={{ $json.telegram_user_id }}",
               "rightValue": "",
               "operator": {
-                "type": "number",
-                "operation": "exists",
+                "type": "string",
+                "operation": "notEmpty",
                 "singleValue": true
               }
             }
           ],
           "combinator": "and"
         },
+        "looseTypeValidation": true,
         "options": {}
       },
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        -3808,
-        -1248
+        -4912,
+        -800
       ],
       "id": "e307dd20-7652-444f-a2c4-c74e2406b5cc",
       "name": "Session Found?",
@@ -806,8 +622,8 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
       "position": [
-        -3552,
-        -1008
+        -4912,
+        -528
       ],
       "id": "1cceadd1-2bd5-4a1e-b778-6826ba355981",
       "name": "GS – Create Session",
@@ -822,13 +638,11 @@
       "parameters": {
         "method": "POST",
         "url": "https://api.groq.com/openai/v1/chat/completions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "groqApi",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
-            {
-              "name": "Authorization",
-              "value": "Bearer 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"
-            },
             {
               "name": "Content-Type",
               "value": "application/json"
@@ -843,11 +657,17 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        -4432,
-        -1088
+        -4464,
+        -1584
       ],
       "id": "20ac6daa-c1cd-447d-bd80-f0be8a1ffa25",
-      "name": "HTTP Request"
+      "name": "HTTP Request",
+      "credentials": {
+        "groqApi": {
+          "id": "2PsjmLSuS95Ki0yX",
+          "name": "Groq account"
+        }
+      }
     },
     {
       "parameters": {
@@ -856,55 +676,21 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -4416,
-        -832
+        -4448,
+        -1312
       ],
       "id": "50242c4a-c446-40ea-a370-8eeec1ef6621",
       "name": "JS - Parse Groq JSON"
     },
     {
       "parameters": {
-        "conditions": {
-          "options": {
-            "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "strict",
-            "version": 3
-          },
-          "conditions": [
-            {
-              "id": "3188d466-9544-4b5e-bfa9-c87ceaf6cbce",
-              "leftValue": "={{$json.intent}}",
-              "rightValue": "book",
-              "operator": {
-                "type": "string",
-                "operation": "equals",
-                "name": "filter.operator.equals"
-              }
-            }
-          ],
-          "combinator": "and"
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2.3,
-      "position": [
-        -4416,
-        -592
-      ],
-      "id": "e67ab2e0-06b3-44ee-9997-5de98145cd3a",
-      "name": "If"
-    },
-    {
-      "parameters": {
-        "jsCode": "const session = $node[\"Session Found?\"].json; // session row (or empty)\nconst ai = $node[\"JS - Parse Groq JSON\"].json;\n\nconst state = (session && session.state) ? String(session.state) : \"idle\";\nconst intent = String(ai.intent || \"unknown\").toLowerCase();\n\nlet route = \"fallback\";\nif (intent === \"catalog\") route = \"catalog\";\nelse if (intent === \"book\" || state.startsWith(\"collect_\") || state === \"confirm\") route = \"booking\";\nelse if (intent === \"browse\") route = \"browse\";\nelse if (intent === \"help\") route = \"help\";\nelse if (intent === \"cancel\") route = \"cancel\";\n\nreturn [{\n  json: {\n    ...ai,\n    route,\n    state,\n    session_row_number: session?.row_number ?? null,\n    telegram_user_id: session?.telegram_user_id ?? null,\n    chat_id: session?.chat_id ?? null,\n  }\n}];"
+        "jsCode": "const session = $node[\"Session Found?\"].json; // session row (or empty)\nconst ai = $node[\"JS - Parse Groq JSON\"].json;\n\nconst state = (session && session.state) ? String(session.state) : \"idle\";\nconst intent = String(ai.intent || \"unknown\").toLowerCase();\n\nlet route = \"fallback\";\nif (intent === \"catalog\") route = \"catalog\";\nelse if (intent === \"book\" || state.startsWith(\"collect_\") || state === \"confirm\") route = \"booking\";\nelse if (intent === \"browse\") route = \"browse\";\nelse if (intent === \"help\") route = \"help\";\nelse if (intent === \"cancel\") route = \"cancel\";\n\nreturn [{\n  json: {\n    ...ai,\n    route,\n    state,\n    session_row_number: session?.row_number ?? null,\n    telegram_user_id: session?.telegram_user_id ?? $node[\"SET - Normalize Input\"].json.telegram_user_id,\nchat_id: session?.chat_id ?? $node[\"SET - Normalize Input\"].json.chat_id,\n  }\n}];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -3312,
-        -1264
+        -4496,
+        -1088
       ],
       "id": "1faf7463-b6bf-483e-ad26-a03995fa06d0",
       "name": "Route JS"
@@ -922,25 +708,25 @@
             {
               "id": "d002361c-4950-413f-bc40-ebbf45f2c55c",
               "name": "draft_customer_name",
-              "value": "={{$json.customer_name \n\n $json.draft_customer_name \n\n \"\"}}",
+              "value": "={{ $json.customer_name || $json.draft_customer_name || \"\" }}",
               "type": "string"
             },
             {
               "id": "eba5a6af-4028-4edf-91a2-ae948c438e47",
               "name": "draft_email",
-              "value": "={{$json.email \n\n $json.draft_email \n\n \"\"}}",
+              "value": "={{ $json.email || $json.draft_email || \"\" }}",
               "type": "string"
             },
             {
               "id": "02979f17-0099-4e4f-977e-bc136738add3",
               "name": "draft_date",
-              "value": "={{$json.preferred_date \n\n $json.draft_date \n\n \"\"}}",
+              "value": "={{ $json.preferred_date || $json.draft_date || \"\" }}",
               "type": "string"
             },
             {
               "id": "59cf0703-4aed-4230-9e0f-4a44c921d6dc",
               "name": "draft_time",
-              "value": "={{$json.preferred_time \n\n $json.draft_time \n\n \"\"}}",
+              "value": "={{ $json.preferred_time || $json.draft_time || \"\" }}",
               "type": "string"
             },
             {
@@ -980,8 +766,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        -3296,
-        -1024
+        -4448,
+        -880
       ],
       "id": "8d92d54a-60aa-4343-aa87-12df9c3f0b88",
       "name": "Merge Draft"
@@ -989,14 +775,16 @@
     {
       "parameters": {
         "chatId": "={{ $node[\"TG Trigger - Incoming Message\"].json.message.chat.id }}",
-        "text": "What Is your name?",
-        "additionalFields": {}
+        "text": "👤 Please enter your *full name*:",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
       },
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        -2576,
-        -1568
+        -2000,
+        -2048
       ],
       "id": "0b5eb160-cc6a-4350-a833-411212b95f35",
       "name": "Ask Name",
@@ -1011,14 +799,16 @@
     {
       "parameters": {
         "chatId": "={{ $node[\"TG Trigger - Incoming Message\"].json.message.chat.id }}",
-        "text": "Please type your email  address.",
-        "additionalFields": {}
+        "text": "📧 Please enter your *email address*:",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
       },
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        -2304,
-        -1392
+        -2080,
+        -1616
       ],
       "id": "28352669-77b0-4cb5-afdc-7d15680effc1",
       "name": "Ask Mail",
@@ -1049,15 +839,12 @@
           "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18F8tJXAN7di0RyN6lUjE7BpliA5W1u3GKtuRz-F3sDY/edit#gid=491243156"
         },
         "columns": {
-          "mappingMode": "autoMapInputData",
+          "mappingMode": "defineBelow",
           "value": {
             "state": "collect_name",
             "updated_at": "=={{ new Date().toISOString() }}",
-            "telegram_user_id": "=={{$json.telegram_user_id}}",
-            "row_number": "=",
-            "draft_customer_name": "={{ $json.draft_customer_name }}",
-            "draft_email": "={{ $json.draft_email }}",
-            "draft_product_id": "="
+            "telegram_user_id": "=={{ $node[\"SET - Normalize Input\"].json.telegram_user_id }}",
+            "draft_product_id": "={{ $node[\"Merge Draft\"].json.draft_product_id }}"
           },
           "matchingColumns": [
             "telegram_user_id"
@@ -1107,7 +894,8 @@
               "defaultMatch": false,
               "display": true,
               "type": "string",
-              "canBeUsedToMatch": true
+              "canBeUsedToMatch": true,
+              "removed": true
             },
             {
               "id": "draft_email",
@@ -1116,170 +904,8 @@
               "defaultMatch": false,
               "display": true,
               "type": "string",
-              "canBeUsedToMatch": true
-            },
-            {
-              "id": "draft_date",
-              "displayName": "draft_date",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "canBeUsedToMatch": true
-            },
-            {
-              "id": "draft_time",
-              "displayName": "draft_time",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "canBeUsedToMatch": true
-            },
-            {
-              "id": "updated_at",
-              "displayName": "updated_at",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "canBeUsedToMatch": true
-            },
-            {
-              "id": "ok",
-              "displayName": "ok",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
               "canBeUsedToMatch": true,
-              "removed": false
-            },
-            {
-              "id": "result",
-              "displayName": "result",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "canBeUsedToMatch": true,
-              "removed": false
-            },
-            {
-              "id": "row_number",
-              "displayName": "row_number",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "number",
-              "canBeUsedToMatch": true,
-              "readOnly": true,
-              "removed": false
-            }
-          ],
-          "attemptToConvertTypes": false,
-          "convertFieldsToString": false
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.googleSheets",
-      "typeVersion": 4.7,
-      "position": [
-        -2384,
-        -1568
-      ],
-      "id": "7f2cf708-152c-4e79-94be-7d1f7c613bc6",
-      "name": "Update row in sheet",
-      "credentials": {
-        "googleSheetsOAuth2Api": {
-          "id": "klKhIIoPMSlT1P52",
-          "name": "Google Sheets account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "operation": "update",
-        "documentId": {
-          "__rl": true,
-          "value": "18F8tJXAN7di0RyN6lUjE7BpliA5W1u3GKtuRz-F3sDY",
-          "mode": "list",
-          "cachedResultName": "AI Service Booking - Data",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18F8tJXAN7di0RyN6lUjE7BpliA5W1u3GKtuRz-F3sDY/edit?usp=drivesdk"
-        },
-        "sheetName": {
-          "__rl": true,
-          "value": 491243156,
-          "mode": "list",
-          "cachedResultName": "Sessions",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18F8tJXAN7di0RyN6lUjE7BpliA5W1u3GKtuRz-F3sDY/edit#gid=491243156"
-        },
-        "columns": {
-          "mappingMode": "autoMapInputData",
-          "value": {
-            "state": "confirm",
-            "updated_at": "=={{ new Date().toISOString() }}",
-            "telegram_user_id": "={{$json.telegram_user_id}}",
-            "draft_email": "={{$node[\"SET - Normalize Input\"].json.text}}"
-          },
-          "matchingColumns": [
-            "telegram_user_id"
-          ],
-          "schema": [
-            {
-              "id": "telegram_user_id",
-              "displayName": "telegram_user_id",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "canBeUsedToMatch": true,
-              "removed": false
-            },
-            {
-              "id": "chat_id",
-              "displayName": "chat_id",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "canBeUsedToMatch": true
-            },
-            {
-              "id": "state",
-              "displayName": "state",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "canBeUsedToMatch": true
-            },
-            {
-              "id": "draft_product_id",
-              "displayName": "draft_product_id",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "canBeUsedToMatch": true
-            },
-            {
-              "id": "draft_customer_name",
-              "displayName": "draft_customer_name",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "canBeUsedToMatch": true
-            },
-            {
-              "id": "draft_email",
-              "displayName": "draft_email",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "canBeUsedToMatch": true
+              "removed": true
             },
             {
               "id": "draft_date",
@@ -1348,11 +974,11 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
       "position": [
-        -2112,
-        -1392
+        -1776,
+        -2048
       ],
-      "id": "fa4eca8b-12b3-4032-b4e6-b269d178a010",
-      "name": "Update row in sheet1",
+      "id": "7f2cf708-152c-4e79-94be-7d1f7c613bc6",
+      "name": "Update row in sheet",
       "credentials": {
         "googleSheetsOAuth2Api": {
           "id": "klKhIIoPMSlT1P52",
@@ -1367,8 +993,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -3296,
-        -800
+        -4448,
+        -608
       ],
       "id": "5f37d219-dca0-4e9b-b598-3c325d3af050",
       "name": "Fix Types"
@@ -1444,6 +1070,29 @@
                 ],
                 "combinator": "and"
               }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "08fd5f1e-ac48-44b4-ae8e-3f1e4216f62d",
+                    "leftValue": "={{ $json.state }}",
+                    "rightValue": "confirm",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
             }
           ]
         },
@@ -1452,8 +1101,8 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.4,
       "position": [
-        -2480,
-        -288
+        -4096,
+        -928
       ],
       "id": "e348c7b2-9621-41bd-892e-f96fd32d2f27",
       "name": "Switch"
@@ -1465,8 +1114,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -2768,
-        -272
+        -3776,
+        -1184
       ],
       "id": "b4e26d7c-119f-4ee7-abb4-2227c4b5e2f9",
       "name": "Capture Reply"
@@ -1475,14 +1124,14 @@
       "parameters": {
         "sendTo": "=={{$json.email}}",
         "subject": "=={{'Booking Confirmed: ' + $json.booking_id}}",
-        "message": "=={{`Hi ${$json.customer_name || 'Customer'},<br><br>\nYour booking is confirmed.<br>\n<b>Booking ID:</b> ${$json.booking_id || ''}<br>\n<b>Service/Product:</b> ${$json.product_name || $json.product_id || ''}<br>\n<b>Date:</b> ${$json.preferred_date || $json.draft_date || 'Not provided'}<br>\n<b>Time:</b> ${$json.preferred_time || $json.draft_time || 'Not provided'}<br><br>\nThanks.`}}",
+        "message": "=={{\n`<div style=\"font-family:Arial,sans-serif;max-width:600px;margin:0 auto\"><h2 style=\"color:#2e7d32\">✅ Booking Confirmed</h2><p>Hi <b>${$json.customer_name || 'Customer'}</b>,</p><p>Your booking has been successfully confirmed. Here are your details:</p><table style=\"border-collapse:collapse;width:100%\"><tr style=\"background:#f5f5f5\"><td style=\"padding:10px 16px;font-weight:bold;width:140px\">Booking ID</td><td style=\"padding:10px 16px\">${$json.booking_id}</td></tr><tr><td style=\"padding:10px 16px;font-weight:bold\">Service</td><td style=\"padding:10px 16px\">${$json.product_id}</td></tr><tr style=\"background:#f5f5f5\"><td style=\"padding:10px 16px;font-weight:bold\">Name</td><td style=\"padding:10px 16px\">${$json.customer_name}</td></tr><tr><td style=\"padding:10px 16px;font-weight:bold\">Email</td><td style=\"padding:10px 16px\">${$json.email}</td></tr></table><p style=\"margin-top:24px\">We will be in touch shortly to confirm your appointment.</p><p style=\"color:#888;font-size:12px\">This is an automated message. Please do not reply.</p></div>`\n}}",
         "options": {}
       },
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.2,
       "position": [
-        -160,
-        240
+        -1568,
+        -976
       ],
       "id": "84effad1-934a-44ad-901b-79fec35e7ae9",
       "name": "Send a message",
@@ -1501,25 +1150,37 @@
             {
               "id": "f8e9c6fb-9bb8-4f06-9142-6d537d182c62",
               "name": "email",
-              "value": "={{$json.draft_email \n\n $node[\"Merge Draft\"].json.draft_email \n\n $node[\"Fix Types\"].json.draft_email \n\n $node[\"Capture Reply\"].json.draft_email}}",
+              "value": "={{ $node[\"JS - Build Booking Row\"].json.email }}",
               "type": "string"
             },
             {
               "id": "e90ac0d5-46a3-4e40-91ec-d3005ad8b780",
               "name": "customer_name",
-              "value": "={{$json.customer_name \n\n $node[\"Merge Draft\"].json.draft_customer_name}}",
+              "value": "={{ $node[\"JS - Build Booking Row\"].json.customer_name }}",
               "type": "string"
             },
             {
               "id": "49c2e4ac-7cf5-48f9-87c7-eed64794954d",
               "name": "preferred_date",
-              "value": "={{$json.preferred_date \n\n \"\"}}",
+              "value": "={{ $node[\"JS - Build Booking Row\"].json.preferred_date }}",
               "type": "string"
             },
             {
               "id": "b5054a3c-a73c-43a2-9249-911659a703d2",
               "name": "preferred_time",
-              "value": "={{$json.preferred_time \n\n \"\"}}",
+              "value": "={{ $node[\"JS - Build Booking Row\"].json.preferred_time }}",
+              "type": "string"
+            },
+            {
+              "id": "a1b2c3d4-1111-2222-3333-444455556666",
+              "name": "booking_id",
+              "value": "={{ $node[\"JS - Build Booking ID\"].json.booking_id }}",
+              "type": "string"
+            },
+            {
+              "id": "b2c3d4e5-5555-6666-7777-888899990000",
+              "name": "product_id",
+              "value": "={{ $node[\"JS - Build Booking Row\"].json.product_id }}",
               "type": "string"
             }
           ]
@@ -1529,8 +1190,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        -448,
-        240
+        -1840,
+        -976
       ],
       "id": "85bea167-3be5-4cce-bb09-906836acbef8",
       "name": "Edit Fields1"
@@ -1547,18 +1208,8 @@
           "conditions": [
             {
               "id": "7fbae086-3a69-40c5-adc8-9755cdc36248",
-              "leftValue": "={{ $json.route }}",
+              "leftValue": "={{ $json.draft_customer_name || \"\" }}",
               "rightValue": "booking",
-              "operator": {
-                "type": "string",
-                "operation": "equals",
-                "name": "filter.operator.equals"
-              }
-            },
-            {
-              "id": "67ca339b-94c1-4476-bf34-ac85dbdcdce5",
-              "leftValue": "={{ $json.draft_customer_name }}",
-              "rightValue": "",
               "operator": {
                 "type": "string",
                 "operation": "empty",
@@ -1573,8 +1224,8 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        -2784,
-        -1424
+        -2912,
+        -1360
       ],
       "id": "c3290076-c6ab-4e96-8dc2-997811a5d191",
       "name": "Need Name?"
@@ -1590,18 +1241,8 @@
           },
           "conditions": [
             {
-              "id": "b5d52661-93f0-40f1-bbc8-713d4efd191b",
-              "leftValue": "={{ $json.route }}",
-              "rightValue": "booking",
-              "operator": {
-                "type": "string",
-                "operation": "equals",
-                "name": "filter.operator.equals"
-              }
-            },
-            {
               "id": "f299c93c-7693-4e9b-8f05-63cebeaf559b",
-              "leftValue": "={{ $json.draft_email }}",
+              "leftValue": "={{ $json.draft_email || \"\" }}",
               "rightValue": "",
               "operator": {
                 "type": "string",
@@ -1617,8 +1258,8 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        -2544,
-        -1216
+        -2624,
+        -1312
       ],
       "id": "ca9ee3cc-ffa5-4b68-8188-8fe156014fc0",
       "name": "Need Mail?"
@@ -1661,10 +1302,102 @@
                   {
                     "id": "1c7521ed-bd03-4dd2-bc3e-964f994e0880",
                     "leftValue": "={{ $json.route }}",
-                    "rightValue": "book",
+                    "rightValue": "booking",
                     "operator": {
                       "type": "string",
-                      "operation": "startsWith"
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "ea91fbfe-5885-4ffb-9715-d30cad8396d3",
+                    "leftValue": "={{ $json.route }}",
+                    "rightValue": "cancel",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "56470c7c-a4cd-4bcb-b1cf-48a9e52fee6a",
+                    "leftValue": "={{ $json.route }}",
+                    "rightValue": "help",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "29a709a5-bd9f-474a-a6a6-27bd852db24e",
+                    "leftValue": "={{ $json.route }}",
+                    "rightValue": "browse",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "cab7675a-2bbb-4f8d-9a35-9f29384d7f67",
+                    "leftValue": "={{ $json.route }}",
+                    "rightValue": "fallback",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
                     }
                   }
                 ],
@@ -1678,11 +1411,718 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.4,
       "position": [
-        -2784,
-        -800
+        -3632,
+        -944
       ],
       "id": "7675d4e6-bc6d-4eb6-95f2-34695fe8380a",
       "name": "SW - Route Command1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "1db7a7ef-9e9f-4dcf-b605-7563e092c2fc",
+              "leftValue": "={{ $json.state.trim().toLowerCase() }}",
+              "rightValue": "confirm",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -3584,
+        -1536
+      ],
+      "id": "a35efd85-7738-4454-958a-8d7c81f9fbf9",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $node[\"TG Trigger - Incoming Message\"].json.message.chat.id }}",
+        "text": "👋 *Welcome to the Booking Assistant!*\n\nHere's what you can do:\n\n📋 /catalog — Browse available services\n📝 *book P001* — Book a service (replace P001 with the service ID)\n❓ /help — Show all commands\n❌ /cancel — Cancel current session\n\n_Type /catalog to get started._",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -2624,
+        -544
+      ],
+      "id": "ca5d1747-c09e-4e6b-9254-2006a972860e",
+      "name": "Guide Message",
+      "webhookId": "b15a8985-1b80-4648-83cf-588cb4531d22",
+      "credentials": {
+        "telegramApi": {
+          "id": "pgxXcOAGv5RQEpoZ",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "8b9f05a5-ba29-491e-bd47-7290f9afcb6e",
+              "leftValue": "={{ $json.state }}",
+              "rightValue": "confirm",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "c1604bab-be83-4d76-8fdf-97f9a6fb0a47",
+              "leftValue": "={{ ($json.confirm_text || \"\").toLowerCase() }}",
+              "rightValue": "yes",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -2336,
+        -1376
+      ],
+      "id": "f9c5c86a-12f1-461d-b3d7-182f00c69f70",
+      "name": "Confirmed Yes?"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "18F8tJXAN7di0RyN6lUjE7BpliA5W1u3GKtuRz-F3sDY",
+          "mode": "list",
+          "cachedResultName": "AI Service Booking - Data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18F8tJXAN7di0RyN6lUjE7BpliA5W1u3GKtuRz-F3sDY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 491243156,
+          "mode": "list",
+          "cachedResultName": "Sessions",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18F8tJXAN7di0RyN6lUjE7BpliA5W1u3GKtuRz-F3sDY/edit#gid=491243156"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "state": "idle",
+            "telegram_user_id": "={{ $node[\"SET - Normalize Input\"].json.telegram_user_id }}",
+            "updated_at": "={{ new Date().toISOString() }}"
+          },
+          "matchingColumns": [
+            "telegram_user_id"
+          ],
+          "schema": [
+            {
+              "id": "telegram_user_id",
+              "displayName": "telegram_user_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "chat_id",
+              "displayName": "chat_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "state",
+              "displayName": "state",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "draft_product_id",
+              "displayName": "draft_product_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "draft_customer_name",
+              "displayName": "draft_customer_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "draft_email",
+              "displayName": "draft_email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "draft_date",
+              "displayName": "draft_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "draft_time",
+              "displayName": "draft_time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "updated_at",
+              "displayName": "updated_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ok",
+              "displayName": "ok",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "result",
+              "displayName": "result",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -1360,
+        -976
+      ],
+      "id": "9f03df8b-a2b4-4d78-8943-25ba9df80f99",
+      "name": "GS - Reset Session",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "klKhIIoPMSlT1P52",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $node[\"TG Trigger - Incoming Message\"].json.message.chat.id }}",
+        "text": "=✅ *Booking Confirmed\\!*\n\n🎫 *Booking ID:* `{{ $node[\"JS - Build Booking ID\"].json.booking_id }}`\n👤 *Name:* {{ $node[\"JS - Build Booking Row\"].json.customer_name }}\n📋 *Service:* {{ $node[\"JS - Build Booking Row\"].json.product_id }}\n\n📧 A confirmation email has been sent\\.\nType /catalog to make another booking\\.",
+        "additionalFields": {
+          "parse_mode": "MarkdownV2"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -1152,
+        -976
+      ],
+      "id": "8ffb2063-36b9-48e5-8588-90440eb8f6ce",
+      "name": "Send a text message4",
+      "webhookId": "65758bf0-5e12-4f4b-b895-80d19a5821c7",
+      "credentials": {
+        "telegramApi": {
+          "id": "pgxXcOAGv5RQEpoZ",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $node[\"TG Trigger - Incoming Message\"].json.message.chat.id }}",
+        "text": "❌ *Booking cancelled\\.* Your session has been cleared\\.\n\nType /catalog to browse services or *book \\<ID\\>* to start a new booking\\.",
+        "additionalFields": {
+          "parse_mode": "MarkdownV2"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -2608,
+        -1168
+      ],
+      "id": "fb822921-8e19-4cdc-bc58-a48d1600d18d",
+      "name": "Cancel Message",
+      "webhookId": "bfdeafff-0632-49ab-a9a7-4ad2e47c23bd",
+      "credentials": {
+        "telegramApi": {
+          "id": "pgxXcOAGv5RQEpoZ",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $node[\"TG Trigger - Incoming Message\"].json.message.chat.id }}",
+        "text": "❓ *Booking Assistant — Help*\n\n*Commands:*\n📋 /catalog — View all available services\n📝 *book \\<ID\\>* — Start booking (e.g. `book P001`)\n❌ /cancel — Cancel your current booking session\n❓ /help — Show this help message\n\n*How to book step by step:*\n1\\. Type /catalog to see all services and their IDs\n2\\. Type `book P001` \\(use the real service ID\\)\n3\\. Enter your full name when asked\n4\\. Enter your email address when asked\n5\\. Review the summary and reply *YES* to confirm or *NO* to cancel",
+        "additionalFields": {
+          "parse_mode": "MarkdownV2"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -2608,
+        -960
+      ],
+      "id": "b9176877-f5c6-4a90-889e-a1bf7891821c",
+      "name": "Help Message",
+      "webhookId": "94716e46-7592-45b2-9e50-b35ca3f8778b",
+      "credentials": {
+        "telegramApi": {
+          "id": "pgxXcOAGv5RQEpoZ",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $node[\"TG Trigger - Incoming Message\"].json.message.chat.id }}",
+        "text": "🔍 I couldn't find an exact match for that\\.\n\nType /catalog to see all available services, or try `book P001` with a specific service ID from the catalog\\.",
+        "additionalFields": {
+          "parse_mode": "MarkdownV2"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -2624,
+        -752
+      ],
+      "id": "53645820-1d03-45e9-b3e5-9b03043a7464",
+      "name": "Browse",
+      "webhookId": "02d594d1-76d7-406b-8c70-fcae2402aaec",
+      "credentials": {
+        "telegramApi": {
+          "id": "pgxXcOAGv5RQEpoZ",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $node[\"TG Trigger - Incoming Message\"].json.message.chat.id }}",
+        "text": "=={{ `🗓️ *Booking Summary*\n\n🔹 Service: ${$json.draft_product_id || \"Not set\"}\n👤 Name: ${$json.draft_customer_name || \"Not set\"}\n📧 Email: ${$json.draft_email || \"Not set\"}\n\n✅ Reply *YES* to confirm\n❌ Reply *NO* to cancel` }}",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -2304,
+        -880
+      ],
+      "id": "4d74186e-4192-4061-a6da-16d83e33889e",
+      "name": "Booking Summary",
+      "webhookId": "70c805e8-c4a6-4cb8-84f1-79f966adcbe8",
+      "credentials": {
+        "telegramApi": {
+          "id": "pgxXcOAGv5RQEpoZ",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "18F8tJXAN7di0RyN6lUjE7BpliA5W1u3GKtuRz-F3sDY",
+          "mode": "list",
+          "cachedResultName": "AI Service Booking - Data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18F8tJXAN7di0RyN6lUjE7BpliA5W1u3GKtuRz-F3sDY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 491243156,
+          "mode": "list",
+          "cachedResultName": "Sessions",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18F8tJXAN7di0RyN6lUjE7BpliA5W1u3GKtuRz-F3sDY/edit#gid=491243156"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "state": "collect_email",
+            "draft_customer_name": "={{ $node[\"Capture Reply\"].json.draft_customer_name }}",
+            "telegram_user_id": "=={{ $node[\"SET - Normalize Input\"].json.telegram_user_id }}",
+            "updated_at": "={{ new Date().toISOString() }}",
+            "draft_product_id": "={{ $node[\"Capture Reply\"].json.draft_product_id }}"
+          },
+          "matchingColumns": [
+            "telegram_user_id"
+          ],
+          "schema": [
+            {
+              "id": "telegram_user_id",
+              "displayName": "telegram_user_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "chat_id",
+              "displayName": "chat_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "state",
+              "displayName": "state",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "draft_product_id",
+              "displayName": "draft_product_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "draft_customer_name",
+              "displayName": "draft_customer_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "draft_email",
+              "displayName": "draft_email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "draft_date",
+              "displayName": "draft_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "draft_time",
+              "displayName": "draft_time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "updated_at",
+              "displayName": "updated_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ok",
+              "displayName": "ok",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "result",
+              "displayName": "result",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -2976,
+        -1616
+      ],
+      "id": "f75f9eda-d8c6-4f2a-9c57-210518620b9e",
+      "name": "Update row in sheet 2",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "klKhIIoPMSlT1P52",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "18F8tJXAN7di0RyN6lUjE7BpliA5W1u3GKtuRz-F3sDY",
+          "mode": "list",
+          "cachedResultName": "AI Service Booking - Data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18F8tJXAN7di0RyN6lUjE7BpliA5W1u3GKtuRz-F3sDY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 491243156,
+          "mode": "list",
+          "cachedResultName": "Sessions",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18F8tJXAN7di0RyN6lUjE7BpliA5W1u3GKtuRz-F3sDY/edit#gid=491243156"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "telegram_user_id": "={{ $node[\"SET - Normalize Input\"].json.telegram_user_id }}",
+            "state": "confirm",
+            "updated_at": "={{ new Date().toISOString() }}",
+            "draft_customer_name": "={{ $node[\"Capture Reply\"].json.draft_customer_name }}",
+            "draft_email": "={{ $node[\"Capture Reply\"].json.draft_email }}",
+            "draft_product_id": "={{ $node[\"Capture Reply\"].json.draft_product_id }}"
+          },
+          "matchingColumns": [
+            "telegram_user_id"
+          ],
+          "schema": [
+            {
+              "id": "telegram_user_id",
+              "displayName": "telegram_user_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "chat_id",
+              "displayName": "chat_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "state",
+              "displayName": "state",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "draft_product_id",
+              "displayName": "draft_product_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "draft_customer_name",
+              "displayName": "draft_customer_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "draft_email",
+              "displayName": "draft_email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "draft_date",
+              "displayName": "draft_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "draft_time",
+              "displayName": "draft_time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "updated_at",
+              "displayName": "updated_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ok",
+              "displayName": "ok",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "result",
+              "displayName": "result",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -2336,
+        -1136
+      ],
+      "id": "9912ed9d-8ec0-44ba-aae6-0c0d4fcde500",
+      "name": "GS - Save Confirm State",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "klKhIIoPMSlT1P52",
+          "name": "Google Sheets account"
+        }
+      }
     }
   ],
   "pinData": {},
@@ -1696,25 +2136,6 @@
             "index": 0
           }
         ]
-      ]
-    },
-    "SW - Route Command": {
-      "main": [
-        [
-          {
-            "node": "GS - Read Products Sheet",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "JS - Parse Book Command",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        []
       ]
     },
     "GS - Read Products Sheet": {
@@ -1733,50 +2154,6 @@
         [
           {
             "node": "TG - Send Catalog",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "JS - Parse Book Command": {
-      "main": [
-        [
-          {
-            "node": "IF - Book Command Valid?",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "IF - Book Command Valid?": {
-      "main": [
-        [
-          {
-            "node": "AI Service Booking - Data",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "TG - Send Booking Reply": {
-      "main": [
-        [
-          {
-            "node": "JS - Build Booking Row",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "AI Service Booking - Data": {
-      "main": [
-        [
-          {
-            "node": "TG - Send Booking Reply",
             "type": "main",
             "index": 0
           }
@@ -1820,7 +2197,7 @@
       "main": [
         [
           {
-            "node": "HTTP Request",
+            "node": "GS - Load Session",
             "type": "main",
             "index": 0
           }
@@ -1842,7 +2219,7 @@
       "main": [
         [
           {
-            "node": "Route JS",
+            "node": "HTTP Request",
             "type": "main",
             "index": 0
           }
@@ -1871,18 +2248,7 @@
       "main": [
         [
           {
-            "node": "If",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "If": {
-      "main": [
-        [
-          {
-            "node": "GS - Load Session",
+            "node": "Route JS",
             "type": "main",
             "index": 0
           }
@@ -1893,7 +2259,7 @@
       "main": [
         [
           {
-            "node": "Route JS",
+            "node": "HTTP Request",
             "type": "main",
             "index": 0
           }
@@ -1935,30 +2301,14 @@
     },
     "Ask Mail": {
       "main": [
-        [
-          {
-            "node": "Update row in sheet1",
-            "type": "main",
-            "index": 0
-          }
-        ]
+        []
       ]
     },
     "Fix Types": {
       "main": [
         [
           {
-            "node": "SW - Route Command1",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Need Name?",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Capture Reply",
+            "node": "Switch",
             "type": "main",
             "index": 0
           }
@@ -1967,11 +2317,30 @@
     },
     "Switch": {
       "main": [
-        [],
-        [],
         [
           {
-            "node": "SW - Route Command",
+            "node": "Capture Reply",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Capture Reply",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "SW - Route Command1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Capture Reply",
             "type": "main",
             "index": 0
           }
@@ -1982,7 +2351,7 @@
       "main": [
         [
           {
-            "node": "Switch",
+            "node": "If",
             "type": "main",
             "index": 0
           }
@@ -2040,7 +2409,7 @@
         ],
         [
           {
-            "node": "SW - Route Command",
+            "node": "Confirmed Yes?",
             "type": "main",
             "index": 0
           }
@@ -2051,22 +2420,141 @@
       "main": [
         [
           {
-            "node": "JS - Build Catalog Message",
+            "node": "GS - Read Products Sheet",
             "type": "main",
             "index": 0
           }
         ],
+        [
+          {
+            "node": "Need Name?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Cancel Message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Help Message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Browse",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Guide Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row in sheet": {
+      "main": [
         []
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Confirmed Yes?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update row in sheet 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Confirmed Yes?": {
+      "main": [
+        [
+          {
+            "node": "JS - Build Booking Row",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "GS - Save Confirm State",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "GS - Reset Session",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GS - Reset Session": {
+      "main": [
+        [
+          {
+            "node": "Send a text message4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row in sheet 2": {
+      "main": [
+        [
+          {
+            "node": "Ask Mail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GS - Save Confirm State": {
+      "main": [
+        [
+          {
+            "node": "Booking Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     }
   },
-  "active": true,
+  "active": false,
   "settings": {
     "executionOrder": "v1",
     "binaryMode": "separate",
     "availableInMCP": false
   },
-  "versionId": "6237f42d-ddbc-460c-928f-7a00752da05a",
+  "versionId": "ac2bead9-4280-4cea-a059-ea2c61e23b01",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "989ce8906127318c23576beb363bb39c58dba1c6429d2c9a37bc9b4c5642d1b3"
